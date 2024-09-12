@@ -6,6 +6,7 @@ using Restaurants.Application.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Restaurants.Queries.GetAllRestaurants;
 using Restaurants.Application.Restaurants.Queries.GetRestaurantById;
+using Restaurants.Infrastructure.Authorization;
 
 namespace NET8_CleanArchitecture_Azure.Controllers;
 
@@ -23,6 +24,7 @@ public class RestaurantsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = PolicyNames.HasMultipleRestaurants)]
     public async Task<IActionResult> GetById(int id)
     {
         var foundRestaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
@@ -38,19 +40,19 @@ public class RestaurantsController(IMediator mediator) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id }, null);
     }
 
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
-    {
-        await mediator.Send(new DeleteRestaurantCommand(id));
-
-        return NoContent();
-    }
-
     [HttpPatch("{id:int}")]
     public async Task<IActionResult> UpdateRestaurant([FromRoute] int id, UpdateRestaurantCommand command)
     {
         command.Id = id;
         await mediator.Send(command);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteRestaurant([FromRoute] int id)
+    {
+        await mediator.Send(new DeleteRestaurantCommand(id));
 
         return NoContent();
     }

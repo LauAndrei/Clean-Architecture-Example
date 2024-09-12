@@ -17,6 +17,11 @@ public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : 
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsync(notFoundException.Message);
         }
+        catch (ForbidException)
+        {
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            await context.Response.WriteAsync("Access forbidden");
+        }
         catch (Exception ex)
         {
             // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
