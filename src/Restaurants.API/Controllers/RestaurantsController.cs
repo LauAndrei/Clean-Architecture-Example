@@ -6,6 +6,7 @@ using Restaurants.Application.Restaurants.Commands.DeleteRestaurant;
 using Restaurants.Application.Restaurants.Commands.UpdateRestaurant;
 using Restaurants.Application.Restaurants.Queries.GetAllRestaurants;
 using Restaurants.Application.Restaurants.Queries.GetRestaurantById;
+using Restaurants.Infrastructure.Authorization;
 
 namespace NET8_CleanArchitecture_Azure.Controllers;
 
@@ -23,6 +24,7 @@ public class RestaurantsController(IMediator mediator) : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [Authorize(Policy = PolicyNames.HasNationality)]
     public async Task<IActionResult> GetById(int id)
     {
         var foundRestaurant = await mediator.Send(new GetRestaurantByIdQuery(id));
